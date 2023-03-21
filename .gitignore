@@ -1,0 +1,30 @@
+# home assistant
+
+## You can whitelist files/folders with !, these will not be ignored.
+!*.yaml
+!.gitignore
+!*.md
+
+## Ignore folders.
+.Trash-0
+.storage
+.cloud
+.google.token
+android
+appdaemon
+themes
+
+
+## Ensure these YAML files are ignored, otherwise your secret data/credentials will leak.
+ip_bans.yaml
+known_devices.yaml
+secrets.yaml
+
+## Others
+._includes
+.homekit.state
+.spotify-token-cache
+.vscode/
+home-assistant_v2.db
+tts/
+airsonos.xml
