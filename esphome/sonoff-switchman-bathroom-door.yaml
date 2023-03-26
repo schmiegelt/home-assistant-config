@@ -1,0 +1,79 @@
+esphome:
+  name: sonoff-switchman-bathroom-door
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+  
+# Enable Home Assistant API
+api:
+  
+ota:
+  password: !secret ota_password
+  
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Sonoff-Fallback"
+    password: !secret ota_password
+
+captive_portal:
+  
+switch:
+  - platform: gpio
+    id: relay_1
+    name: "Left Button"
+    pin: 23
+  - platform: gpio
+    id: relay_2
+    pin: 19
+    name: "Middle Button"
+  - platform: gpio
+    id: relay_3
+    pin: 22
+    name: "Right Button"
+      
+output:
+  - platform: ledc
+    pin: 18
+    frequency: 1000 Hz
+    id: pwm_output
+      
+light:
+  - platform: monochromatic
+    output: pwm_output
+    name: "LEDs"
+  - platform: status_led
+    name: "Switch state"
+    pin:
+      number: 5
+      inverted: true
+  
+binary_sensor:
+  - platform: gpio
+    id: left_button
+    pin:
+      number: 4
+      mode: INPUT_PULLUP
+    on_press:
+      - switch.toggle: relay_1
+  - platform: gpio
+    id: middle_button
+    pin:
+      number: 0
+      mode: INPUT_PULLUP
+    on_press:
+      - switch.toggle: relay_2
+  - platform: gpio
+    id: right_button
+    pin:
+      number: 15
+      mode: INPUT_PULLUP
+    on_press:
+      - switch.toggle: relay_3
