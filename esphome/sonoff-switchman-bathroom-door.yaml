@@ -1,0 +1,94 @@
+esphome:
+  name: sonoff-switchman-bathroom-door
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+  
+# Enable Home Assistant API
+api:
+  
+ota:
+  password: !secret ota_password
+  
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Sonoff-Fallback"
+    password: !secret ota_password
+
+captive_portal:
+  
+sensor:
+  - platform: wifi_signal
+    name: "Sonoff Switchman Spots Wifi"
+    update_interval: 60s
+
+switch:
+  - platform: gpio
+    id: relay_1
+    name: "Left Button"
+    pin: 23
+    restore_mode: RESTORE_DEFAULT_OFF
+  - platform: gpio
+    id: relay_2
+    pin: 19
+    name: "Middle Button"
+    restore_mode: RESTORE_DEFAULT_OFF
+  - platform: gpio
+    id: relay_3
+    pin: 22
+    name: "Right Button"
+    restore_mode: RESTORE_DEFAULT_OFF
+      
+output:
+  - platform: ledc
+    pin: 18
+    frequency: 1000 Hz
+    id: pwm_output
+      
+light:
+  - platform: monochromatic
+    output: pwm_output
+    name: "LEDs"
+  - platform: status_led
+    name: "Switch state"
+    pin:
+      number: 5
+      inverted: true
+  
+binary_sensor:
+  - platform: gpio
+    id: left_button
+    pin:
+      number: 4
+      mode: INPUT_PULLUP
+    on_press:
+      - switch.toggle: relay_1
+  - platform: gpio
+    id: middle_button
+    pin:
+      number: 0
+      mode: INPUT_PULLUP
+    on_press:
+      - switch.toggle: relay_2
+  - platform: gpio
+    id: right_button
+    pin:
+      number: 15
+      mode: INPUT_PULLUP
+    on_press:
+      - switch.toggle: relay_3
+
+esp32_ble_beacon:
+  type: iBeacon
+  uuid: '4edbdead-2fa4-10b2-52b8-0b730ecb704c'
+  tx_power: -12
+  major: 1000
+  minor: 1000
