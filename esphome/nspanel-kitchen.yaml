@@ -10,7 +10,7 @@
 substitutions:
   baud_rate: "115200" # requires 115200 if tft is installed but can be changed to 9600 if tft upload fails and nextion switches to 9600
   # ## usage of secrets-file ## -> comment in ###### Change ME ######
-  device_name: "nspanel-name" # Wird im Blueprint benötigt!
+  device_name: "nspanel_kitchen" # Wird im Blueprint benötigt!
   wifi_ssid: !secret wifi_ssid # add in your esphome secrets file.
   wifi_password: !secret wifi_password # add in your esphome secrets file. -> per default this is also used for ota_password and web_password
   ota_password: !secret new_ota_password # add in your esphome secrets file. - manual change in code required to activate
@@ -90,7 +90,7 @@ ota:
 ##### LOGGER #####
 logger:
   baud_rate: 0
-  # level: WARN
+  level: WARN
 
 ##### CONFIGURE INTERNAL BUZZER #####
 output:
