@@ -90,7 +90,7 @@ ota:
 ##### LOGGER #####
 logger:
   baud_rate: 0
-  level: DEBUG
+  # level: WARN
 
 ##### CONFIGURE INTERNAL BUZZER #####
 output:
