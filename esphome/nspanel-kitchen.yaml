@@ -90,7 +90,7 @@ ota:
 ##### LOGGER #####
 logger:
   baud_rate: 0
-  # level: WARN
+  level: WARN
 
 ##### CONFIGURE INTERNAL BUZZER #####
 output:
@@ -152,6 +152,12 @@ button:
       - uart.write:
           id: tf_uart
           data: [0xFF, 0xFF, 0xFF]
+
+  ###### Button for Cover
+  - name: "Cover Kitchen Toggle"
+    platform: template
+    on_press:
+      - cover.toggle: kitchen_cover
 
 ##### START - API CONFIGURATION #####
 api:
@@ -961,11 +967,11 @@ cover:
 
     open_action:
       - switch.turn_on: relay_2
-    open_duration: 20s
+    open_duration: 16s
 
     close_action:
       - switch.turn_on: relay_1
-    close_duration: 20s
+    close_duration: 16s
 
     stop_action:
       - switch.turn_off: relay_1
