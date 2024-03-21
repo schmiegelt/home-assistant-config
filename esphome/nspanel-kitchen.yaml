@@ -18,23 +18,6 @@ switch:
   - id: !extend relay_2
     interlock: [relay_1, relay_2]
     interlock_wait_time: 500ms  # Please adjust this accordingly
-##### My customization - End #####
-
-# Core and optional configurations
-packages:
-  remote_package:
-    url: https://github.com/Blackymas/NSPanel_HA_Blueprint
-    ref: main
-    files:
-      - nspanel_esphome.yaml # Basic package
-      # Optional advanced and add-on configurations
-      # - esphome/nspanel_esphome_advanced.yaml
-      # - nspanel_esphome_addon_climate_cool.yaml
-      # - nspanel_esphome_addon_climate_heat.yaml
-      # - nspanel_esphome_addon_climate_dual.yaml
-    refresh: 300s
-
-
 cover:
   - platform: time_based
     name: "Kitchen Cover"
@@ -51,3 +34,18 @@ cover:
     stop_action:
       - switch.turn_off: relay_1
       - switch.turn_off: relay_2
+##### My customization - End #####
+
+# Core and optional configurations
+packages:
+  remote_package:
+    url: https://github.com/Blackymas/NSPanel_HA_Blueprint
+    ref: main
+    files:
+      - nspanel_esphome.yaml # Basic package
+      # Optional advanced and add-on configurations
+      # - esphome/nspanel_esphome_advanced.yaml
+      # - nspanel_esphome_addon_climate_cool.yaml
+      # - nspanel_esphome_addon_climate_heat.yaml
+      # - nspanel_esphome_addon_climate_dual.yaml
+    refresh: 300s
