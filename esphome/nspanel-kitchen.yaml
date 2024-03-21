@@ -10,6 +10,9 @@ substitutions:
 
 # Customization area
 ##### My customization - Start #####
+esp32:
+  framework:
+    type: arduino
 switch:
   # Prevents the two relays to be on simultaneously
   - id: !extend relay_1
