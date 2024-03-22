@@ -37,6 +37,11 @@ cover:
     stop_action:
       - switch.turn_off: relay_1
       - switch.turn_off: relay_2
+button:
+  - name: "Cover Kitchen Toggle"
+    platform: template
+    on_press:
+      - cover.toggle: kitchen_cover
 ##### My customization - End #####
 
 # Core and optional configurations
