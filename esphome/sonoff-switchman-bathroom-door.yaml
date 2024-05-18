@@ -1,5 +1,10 @@
+substitutions:
+  device_name: "sonoff-switchman-bathroom-door" 
+  friendly_name: "Sonoff Switchman Bathroom Door"
+
 esphome:
-  name: sonoff-switchman-bathroom-door
+  name: ${device_name}
+  friendly_name: ${friendly_name}
 
 esp32:
   board: esp32dev
@@ -27,7 +32,7 @@ captive_portal:
   
 sensor:
   - platform: wifi_signal
-    name: "Sonoff Switchman Spots Wifi"
+    name: "Wifi"
     update_interval: 60s
 
 switch:
@@ -58,7 +63,7 @@ light:
     output: pwm_output
     name: "LEDs"
   - platform: status_led
-    name: "Switch state"
+    name: "State"
     pin:
       number: 5
       inverted: true

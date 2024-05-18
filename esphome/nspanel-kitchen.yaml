@@ -39,6 +39,7 @@ cover:
       - switch.turn_off: relay_2
 button:
   - name: "Cover Kitchen Toggle"
+    id: kitchen_cover_toggle
     platform: template
     on_press:
       - cover.toggle: kitchen_cover
