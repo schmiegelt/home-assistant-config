@@ -1,0 +1,183 @@
+substitutions:
+  device_name: "shelly-livingroom-ceiling-spots" 
+  friendly_name: "Shelly Livingroom Ceiling Spots"
+
+  max_power: "2000.0"
+  max_temp: "70.0"
+
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  platform: ESP8266
+  board: esp01_1m
+
+
+
+wifi:
+  ssid: !secret wifi_ssid_localonly
+  password: !secret wifi_password_localonly
+  use_address: 192.168.60.195
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Sonoff-Fallback"
+    password: !secret ota_password
+
+captive_portal:
+
+# Enable logging
+#logger:
+#  level: DEBUG
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret encryption_key
+
+ota:
+  password: !secret ota_password
+
+# Disabled to save space
+#web_server:
+#  port: 80
+
+#ToDo: Check if necessary
+#time:
+#  - platform: sntp
+#    id: my_time
+
+i2c:
+  sda: GPIO12
+  scl: GPIO14
+
+sensor:
+  - platform: ade7953_i2c
+    irq_pin: GPIO16 # Prevent overheating by setting this
+    voltage:
+      name: "Voltage"
+    # On the Shelly 2.5 channels are mixed ch1=B ch2=A
+    current_a:
+      name: "Current A"
+      internal: true
+    current_b:
+      name: "Current B"
+      internal: true
+    active_power_a:
+      name: "Power A"
+      id: power_channel_2
+      # active_power_a is normal, so don't multiply by -1
+      on_value_range:
+        - above: ${max_power}
+          then:
+            - switch.turn_off: shelly_relay_2
+            - homeassistant.service:
+                service: persistent_notification.create
+                data:
+                  title: Message from ${device_name}
+                data_template:
+                  message: Switch turned off because power exceeded ${max_power}W
+    active_power_b:
+      name: "Power B"
+      id: power_channel_1
+      # active_power_b is inverted, so take the absolute value
+      filters:
+        - lambda: return abs(x);
+      on_value_range:
+        - above: ${max_power}
+          then:
+            - switch.turn_off: shelly_relay_1
+            - homeassistant.service:
+                service: persistent_notification.create
+                data:
+                  title: Message from ${device_name}
+                data_template:
+                  message: Switch turned off because power exceeded ${max_power}W
+    update_interval: 30s
+
+
+# Remove because time is necessary
+#  - platform: total_daily_energy
+#    name: "Energy A"
+#    power_id: power_channel_1
+#    filters:
+#      # Multiplication factor from W to kWh is 0.001
+#      - multiply: 0.001
+#    unit_of_measurement: kWh
+
+#  - platform: total_daily_energy
+#    name: "Energy B"
+#    power_id: power_channel_2
+#    filters:
+#      # Multiplication factor from W to kWh is 0.001
+#      - multiply: 0.001
+#    unit_of_measurement: kWh
+
+# NTC Temperature
+  - platform: ntc
+    sensor: temp_resistance_reading
+    name: ${devicename} temperature
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    icon: "mdi:thermometer"
+    calibration:
+      b_constant: 3350
+      reference_resistance: 10kOhm
+      reference_temperature: 298.15K
+    on_value_range:
+      - above: ${max_temp}
+        then:
+          - switch.turn_off: shelly_relay_1
+          - switch.turn_off: shelly_relay_2
+          - homeassistant.service:
+              service: persistent_notification.create
+              data:
+                title: Message from ${devicename}
+              data_template:
+                message: Switch turned off because temperature exceeded ${max_temp}°C
+  - platform: resistance
+    id: temp_resistance_reading
+    sensor: temp_analog_reading
+    configuration: DOWNSTREAM
+    resistor: 32kOhm
+  - platform: adc
+    id: temp_analog_reading
+    pin: A0
+
+status_led:
+  pin:
+    number: GPIO0
+    inverted: yes
+
+switch:
+  - platform: gpio
+    id: shelly_relay_1
+    name: "Relay A"
+    pin: GPIO4
+    icon: "mdi:electric-switch"
+    restore_mode: RESTORE_DEFAULT_OFF
+    # Ensure only one switch at a time is on (https://esphome.io/components/switch/gpio.html#interlocking)
+    interlock: &interlock_group [shelly_relay_1, shelly_relay_2]
+
+  - platform: gpio
+    id: shelly_relay_2
+    name: "Relay B"
+    pin: GPIO15
+    icon: "mdi:electric-switch"
+    restore_mode: RESTORE_DEFAULT_OFF
+    interlock: *interlock_group
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO13
+    name: "Input A"
+    on_state:
+      then:
+        - switch.toggle: shelly_relay_1
+  - platform: gpio
+    pin:
+      number: GPIO5
+    name: "Input B"
+    on_state:
+      then:
+        - switch.toggle: shelly_relay_2
